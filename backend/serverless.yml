@@ -1,0 +1,83 @@
+service: image-resizer-backend
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  region: ${env:REGION, 'us-east-1'}
+  environment:
+    S3_BUCKET: ${env:S3_BUCKET}
+    REGION: ${env:REGION}
+    LOCALSTACK_ENDPOINT: ${env:LOCALSTACK_ENDPOINT}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:ListBucket
+            - s3:HeadObject
+          Resource:
+            - arn:aws:s3:::${env:S3_BUCKET}
+            - arn:aws:s3:::${env:S3_BUCKET}/*
+
+functions:
+  uploadImage:
+    handler: dist/handlers/uploadImage.handler
+    events:
+      - http:
+          path: images
+          method: post
+          cors: true
+
+  getImages:
+    handler: dist/handlers/getImages.handler
+    events:
+      - http:
+          path: images
+          method: get
+          cors:
+            origin: "*"
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+
+  resizeImages:
+    handler: dist/handlers/resizeImages.handler
+    events:
+      - http:
+          path: images/{dimensions}/{object+}
+          method: get
+          cors: true
+
+  getOriginalImage:
+    handler: dist/handlers/getOriginalImage.handler
+    events:
+      - http:
+          path: images/originals/{key+}
+          method: get
+          cors: true
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-offline
+
+package:
+  exclude:
+    - node_modules/**
+    - src/**
+
+custom:
+  dotenv:
+    logging: true
+    path: .env
+  serverless-offline:
+    httpPort: 3003
+    lambdaPort: 3002
+    noPrependStageInUrl: true

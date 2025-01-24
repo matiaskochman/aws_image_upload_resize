@@ -1,0 +1,72 @@
+# Image Resizer Backend
+
+## Overview
+
+This backend service is designed to handle image uploads, retrieval, and resizing. It leverages AWS S3 for storage and LocalStack for local development and testing.
+
+## Functionality
+
+- **Upload Image**: Allows users to upload images to an S3 bucket.
+- **Get Images**: Retrieves a list of images from the S3 bucket.
+- **Resize Images**: Resizes images on-the-fly based on the requested dimensions.
+
+## Installation
+
+### Prerequisites
+
+- Docker
+- Node.js (version 16.x)
+- npm or yarn
+
+### Steps
+
+1. **Clone the Repository**
+
+   ```sh
+   git clone https://github.com/your-repo/image-resizer-backend.git
+   cd image-resizer-backend
+   ```
+
+2. **Install Dependencies**
+
+   ```sh
+   npm install
+   ```
+
+3. **Set Up Environment Variables**
+
+   Create a `.env` file in the `backend` directory with the following content:
+
+   ```sh
+   S3_BUCKET=image-resizer-backend-dev-images
+   REGION=us-east-1
+   LOCALSTACK_ENDPOINT=http://localhost:4566
+   ```
+
+4. **Run LocalStack**
+
+   Follow the instructions in [SETUP_LOCALSTACK.md](SETUP_LOCALSTACK.md) to set up and run LocalStack. This file contains detailed configuration and setup instructions for LocalStack.
+
+5. **Deploy the Service**
+
+   Use the Serverless Framework to deploy the service:
+
+   ```sh
+   npx serverless deploy
+   ```
+
+6. **Start the Service**
+
+   Start the service locally using the Serverless Offline plugin:
+
+   ```sh
+   npx serverless offline
+   ```
+
+You can find these files in the `backend` directory.
+
+## Usage
+
+- **Upload Image**: Send a POST request to `/images` with the image file.
+- **Get Images**: Send a GET request to `/images` to retrieve a list of images.
+- **Resize Images**: Send a GET request to `/images/{widthxheight}/{object}` to retrieve a resized image.
