@@ -1,3 +1,4 @@
+# Path: serverless.yml
 service: image-resizer-backend
 
 frameworkVersion: "3"
@@ -5,11 +6,17 @@ frameworkVersion: "3"
 provider:
   name: aws
   runtime: nodejs16.x
-  region: ${env:REGION, 'us-east-1'}
+  # Por defecto, si no pasas --stage, se usará 'dev'
+  stage: ${opt:stage, 'dev'}
+  # El region aquí es fijo, por ejemplo 'us-east-1'.
+  # Podrías cambiarlo si lo deseas.
+  region: us-east-1
+
+  # Si deseas definir alguna variable fija de entorno, hazlo aquí.
+  # Si no, podrías dejarlo vacío.
   environment:
-    S3_BUCKET: ${env:S3_BUCKET}
-    REGION: ${env:REGION}
-    LOCALSTACK_ENDPOINT: ${env:LOCALSTACK_ENDPOINT}
+    NODE_ENV: ${opt:stage, 'dev'}
+
   iam:
     role:
       statements:
@@ -19,9 +26,12 @@ provider:
             - s3:GetObject
             - s3:ListBucket
             - s3:HeadObject
+            - s3:ListObjectsV2
+          # Usamos comodín para permitir acceso a cualquier bucket.
+          # Si quieres restringirlo, pon aquí un ARN fijo.
           Resource:
-            - arn:aws:s3:::${env:S3_BUCKET}
-            - arn:aws:s3:::${env:S3_BUCKET}/*
+            - arn:aws:s3:::*
+            - arn:aws:s3:::*/*
 
 functions:
   uploadImage:
@@ -31,6 +41,11 @@ functions:
           path: images
           method: post
           cors: true
+    package:
+      patterns:
+        - "dist/**"
+        - "node_modules/**"
+        - "!node_modules/aws-sdk/**"
 
   getImages:
     handler: dist/handlers/getImages.handler
@@ -47,6 +62,11 @@ functions:
               - X-Api-Key
               - X-Amz-Security-Token
               - X-Amz-User-Agent
+    package:
+      patterns:
+        - "dist/**"
+        - "node_modules/**"
+        - "!node_modules/aws-sdk/**"
 
   resizeImages:
     handler: dist/handlers/resizeImages.handler
@@ -55,6 +75,11 @@ functions:
           path: images/{dimensions}/{object+}
           method: get
           cors: true
+    package:
+      patterns:
+        - "dist/**"
+        - "node_modules/**"
+        - "!node_modules/aws-sdk/**"
 
   getOriginalImage:
     handler: dist/handlers/getOriginalImage.handler
@@ -63,20 +88,32 @@ functions:
           path: images/originals/{key+}
           method: get
           cors: true
+    package:
+      patterns:
+        - "dist/**"
+        - "node_modules/**"
+        - "!node_modules/aws-sdk/**"
 
 plugins:
   - serverless-dotenv-plugin
   - serverless-offline
 
 package:
-  exclude:
-    - node_modules/**
-    - src/**
+  patterns:
+    - "dist/**"
+    - "node_modules/**"
+    - "serverless.yml"
+    - "!src/**"
+    - "!node_modules/aws-sdk/**"
 
 custom:
+  # Configuración del plugin dotenv.
+  # Cargará .env.dev si no pasas --stage,
+  # .env.staging si pasas --stage staging, etc.
   dotenv:
     logging: true
-    path: .env
+    path: .env.${opt:stage, 'dev'}
+
   serverless-offline:
     httpPort: 3003
     lambdaPort: 3002

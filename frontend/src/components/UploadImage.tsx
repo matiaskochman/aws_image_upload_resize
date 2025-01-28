@@ -82,6 +82,7 @@ const UploadImage: React.FC<UploadImageProps> = ({ onUploadSuccess }) => {
       const base64 = dataUrl.split(",")[1]; // Extraer solo la parte Base64
       const mimeType = file.type; // Obtener el tipo MIME del archivo
 
+      console.log("api: ", process.env.REACT_APP_API_URL);
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/images`,
         {

@@ -48,12 +48,20 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     return {
       statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": "true",
+      },
       body: JSON.stringify({ message: "Image uploaded successfully", key }),
     };
   } catch (error) {
     console.error("Error uploading image:", error);
     return {
       statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": "true",
+      },
       body: JSON.stringify({
         message: "Error uploading image",
         error: error instanceof Error ? error.message : "Unknown error",

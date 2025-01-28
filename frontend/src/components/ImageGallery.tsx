@@ -62,10 +62,13 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ updateTrigger }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const fetchImages = useCallback(async () => {
+    console.log("api: ", process.env.REACT_APP_API_URL);
+    console.log("LOCALSTACK_ENDPOINT:", process.env.LOCALSTACK_ENDPOINT); // Agregar este log
     try {
       const response = await axios.get(
         `${process.env.REACT_APP_API_URL}/images`
       );
+
       setImages(response.data.images);
     } catch (error) {
       console.error("Error fetching images:", error);

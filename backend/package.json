@@ -5,10 +5,10 @@
   "scripts": {
     "build": "tsc",
     "deploy": "sls deploy",
-    "deploy:staging": "sls deploy --stage staging",
+    "deploy:staging": "npm run clean && npm i && npm run build && sls deploy --stage staging",
     "deploy:prod": "sls deploy --stage production",
     "offline": "npm run build && sls offline",
-    "clean": "rm -rf node_modules dist .serverless .build .webpack && find . -name '*.tsbuildinfo' -delete && find . -name '*.DS_Store' -delete",
+    "clean": "rm -rf node_modules dist .serverless .build .webpack package-lock.json && find . -name '*.tsbuildinfo' -delete && find . -name '*.DS_Store' -delete",
     "test": "jest"
   },
   "devDependencies": {
@@ -17,20 +17,18 @@
     "@types/jest": "^29.5.14",
     "@types/node": "^18.0.0",
     "@types/uuid": "^9.0.8",
-    "aws-sdk": "^2.1360.0",
+    "dotenv-cli": "^8.0.0",
     "jest": "^29.0.0",
     "serverless": "^3.0.0",
     "serverless-dotenv-plugin": "^6.0.0",
     "serverless-offline": "^8.0.0",
-    "sharp": "^0.32.0",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.0.0",
-    "typescript": "^5.0.0",
-    "uuid": "^9.0.0"
+    "typescript": "^5.0.0"
   },
   "dependencies": {
     "aws-sdk": "^2.1360.0",
     "sharp": "^0.32.0",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.1"
   }
 }
